@@ -32,8 +32,9 @@ export async function fetchLinkPreview(
   const base: LinkPreview = { url, fetchedAt: Date.now() };
 
   try {
+    const timeoutSignal = AbortSignal.timeout(8000);
     const response = await fetch(CORS_PROXY + encodeURIComponent(url), {
-      signal: signal ?? AbortSignal.timeout(8000),
+      signal: signal ? AbortSignal.any([signal, timeoutSignal]) : timeoutSignal,
     });
 
     if (!response.ok) return base;

@@ -4,7 +4,7 @@ import { usePosts } from '@/hooks/usePosts';
 import type { Post, StoredImage } from '@/types';
 
 export default function App() {
-  const { posts, loading, hasMore, loadMore, addPost, removePost } = usePosts();
+  const { posts, loading, hasMore, error, loadMore, addPost, removePost } = usePosts();
 
   const handleSubmit = (post: Post, image?: StoredImage) => {
     addPost(post, image);
@@ -25,6 +25,15 @@ export default function App() {
           </h1>
         </div>
       </header>
+
+      {/* Error toast */}
+      {error && (
+        <div className="px-4 pt-3">
+          <p className="text-sm text-red-400 bg-red-400/10 rounded-xl px-4 py-3 text-center">
+            {error}
+          </p>
+        </div>
+      )}
 
       {/* Feed */}
       <main className="px-4">
