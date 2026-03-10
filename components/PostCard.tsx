@@ -70,7 +70,7 @@ export function PostCard({ post, onDelete }: PostCardProps) {
         <img
           src={imageUrl}
           alt=""
-          className="w-full rounded-lg object-cover max-h-80 mb-3"
+          className="w-full rounded-xl object-cover max-h-80 mb-3"
           loading="lazy"
         />
       )}

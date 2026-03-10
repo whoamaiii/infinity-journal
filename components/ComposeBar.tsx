@@ -142,7 +142,7 @@ export function ComposeBar({ onSubmit }: ComposeBarProps) {
       {/* Link preview */}
       {linkPreview && linkPreview.title && (
         <div className="px-4 pt-3">
-          <div className="flex items-center gap-2 bg-card-bg rounded-lg p-2 border border-border-subtle">
+          <div className="flex items-center gap-2 bg-card-bg/80 rounded-xl p-2 border border-white/[0.06]">
             {linkPreview.image && (
               <img
                 src={linkPreview.image}
@@ -230,7 +230,7 @@ export function ComposeBar({ onSubmit }: ComposeBarProps) {
           className={`flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-full transition-all duration-200 ${
             hasContent
               ? 'bg-electric-blue text-near-black'
-              : 'bg-card-bg border border-border-subtle text-secondary-text/40'
+              : 'bg-card-bg/80 border border-white/[0.06] text-secondary-text/40'
           }`}
           aria-label="Post"
         >
