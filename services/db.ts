@@ -14,6 +14,9 @@ function getDB(): Promise<IDBPDatabase> {
         postStore.createIndex('by-date', 'createdAt');
         db.createObjectStore('images', { keyPath: 'id' });
       },
+    }).catch((err) => {
+      dbPromise = null;
+      throw err;
     });
   }
   return dbPromise;
@@ -43,7 +46,7 @@ export async function getRecentPosts(
 
   const posts: Post[] = [];
   const range = beforeTimestamp
-    ? IDBKeyRange.upperBound(beforeTimestamp, true)
+    ? IDBKeyRange.upperBound(beforeTimestamp)
     : undefined;
 
   let cursor = await index.openCursor(range, 'prev');

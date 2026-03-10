@@ -5,7 +5,8 @@ const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
 
 export function extractFirstUrl(text: string): string | null {
   const match = text.match(URL_REGEX);
-  return match ? match[0] : null;
+  if (!match) return null;
+  return match[0].replace(/[.,;:!?)]+$/, '');
 }
 
 function getMetaContent(doc: Document, property: string): string | undefined {
@@ -15,12 +16,24 @@ function getMetaContent(doc: Document, property: string): string | undefined {
   return el?.getAttribute('content') || undefined;
 }
 
-export async function fetchLinkPreview(url: string): Promise<LinkPreview> {
+function isValidImageUrl(url: string | undefined): string | undefined {
+  if (!url) return undefined;
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol === 'https:' || parsed.protocol === 'http:') return url;
+  } catch {}
+  return undefined;
+}
+
+export async function fetchLinkPreview(
+  url: string,
+  signal?: AbortSignal
+): Promise<LinkPreview> {
   const base: LinkPreview = { url, fetchedAt: Date.now() };
 
   try {
     const response = await fetch(CORS_PROXY + encodeURIComponent(url), {
-      signal: AbortSignal.timeout(8000),
+      signal: signal ?? AbortSignal.timeout(8000),
     });
 
     if (!response.ok) return base;
@@ -38,7 +51,7 @@ export async function fetchLinkPreview(url: string): Promise<LinkPreview> {
         getMetaContent(doc, 'og:description') ||
         getMetaContent(doc, 'description') ||
         undefined,
-      image: getMetaContent(doc, 'og:image') || undefined,
+      image: isValidImageUrl(getMetaContent(doc, 'og:image')),
       siteName:
         getMetaContent(doc, 'og:site_name') ||
         new URL(url).hostname.replace('www.', '') ||

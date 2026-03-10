@@ -2,6 +2,8 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import type { Post, StoredImage, LinkPreview } from '@/types';
 import { extractFirstUrl, fetchLinkPreview } from '@/services/linkPreview';
 
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
+
 interface ComposeBarProps {
   onSubmit: (post: Post, image?: StoredImage) => void;
 }
@@ -15,6 +17,8 @@ export function ComposeBar({ onSubmit }: ComposeBarProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const lastFetchedUrl = useRef<string | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+  const submitting = useRef(false);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -24,17 +28,30 @@ export function ComposeBar({ onSubmit }: ComposeBarProps) {
     el.style.height = Math.min(el.scrollHeight, 150) + 'px';
   }, [text]);
 
+  // Revoke image preview URL on unmount or change
+  useEffect(() => {
+    return () => {
+      if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
+    };
+  }, [imagePreviewUrl]);
+
   // Auto-detect URLs and fetch preview
   useEffect(() => {
     const url = extractFirstUrl(text);
     if (!url || url === lastFetchedUrl.current) return;
 
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     lastFetchedUrl.current = url;
     setFetchingLink(true);
 
-    fetchLinkPreview(url).then((preview) => {
-      setLinkPreview(preview);
-      setFetchingLink(false);
+    fetchLinkPreview(url, controller.signal).then((preview) => {
+      if (!controller.signal.aborted) {
+        setLinkPreview(preview);
+        setFetchingLink(false);
+      }
     });
   }, [text]);
 
@@ -42,7 +59,9 @@ export function ComposeBar({ onSubmit }: ComposeBarProps) {
   useEffect(() => {
     const url = extractFirstUrl(text);
     if (!url && linkPreview) {
+      abortRef.current?.abort();
       setLinkPreview(null);
+      setFetchingLink(false);
       lastFetchedUrl.current = null;
     }
   }, [text, linkPreview]);
@@ -50,6 +69,11 @@ export function ComposeBar({ onSubmit }: ComposeBarProps) {
   const handleImageSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size > MAX_IMAGE_SIZE) {
+      alert('Image is too large. Maximum size is 10MB.');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
     setImageFile(file);
     const url = URL.createObjectURL(file);
     setImagePreviewUrl(url);
@@ -63,46 +87,52 @@ export function ComposeBar({ onSubmit }: ComposeBarProps) {
   }, [imagePreviewUrl]);
 
   const handleSubmit = useCallback(async () => {
+    if (submitting.current) return;
     const trimmed = text.trim();
     if (!trimmed && !imageFile) return;
 
-    const now = Date.now();
-    let storedImage: StoredImage | undefined;
-    let imageId: string | undefined;
+    submitting.current = true;
+    try {
+      const now = Date.now();
+      let storedImage: StoredImage | undefined;
+      let imageId: string | undefined;
 
-    if (imageFile) {
-      imageId = crypto.randomUUID();
-      const blob = imageFile;
-      storedImage = {
-        id: imageId,
-        blob,
-        mimeType: imageFile.type,
+      if (imageFile) {
+        imageId = crypto.randomUUID();
+        const blob = imageFile;
+        storedImage = {
+          id: imageId,
+          blob,
+          mimeType: imageFile.type,
+          createdAt: now,
+        };
+      }
+
+      const hasLink = linkPreview !== null;
+      const postType = imageFile ? 'image' : hasLink ? 'link' : 'text';
+
+      const post: Post = {
+        id: crypto.randomUUID(),
+        type: postType,
         createdAt: now,
+        text: trimmed || undefined,
+        imageId,
+        link: linkPreview || undefined,
       };
+
+      onSubmit(post, storedImage);
+
+      // Reset state
+      setText('');
+      clearImage();
+      setLinkPreview(null);
+      lastFetchedUrl.current = null;
+
+      // Dismiss keyboard on iOS so user can see their new post
+      textareaRef.current?.blur();
+    } finally {
+      submitting.current = false;
     }
-
-    const hasLink = linkPreview !== null;
-    const postType = imageFile ? 'image' : hasLink ? 'link' : 'text';
-
-    const post: Post = {
-      id: crypto.randomUUID(),
-      type: postType,
-      createdAt: now,
-      text: trimmed || undefined,
-      imageId,
-      link: linkPreview || undefined,
-    };
-
-    onSubmit(post, storedImage);
-
-    // Reset state
-    setText('');
-    clearImage();
-    setLinkPreview(null);
-    lastFetchedUrl.current = null;
-
-    // Refocus textarea
-    textareaRef.current?.focus();
   }, [text, imageFile, linkPreview, onSubmit, clearImage]);
 
   const handleKeyDown = useCallback(

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { Post } from '@/types';
 import { getImage } from '@/services/db';
 
@@ -26,19 +26,24 @@ interface PostCardProps {
 export function PostCard({ post, onDelete }: PostCardProps) {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [showDelete, setShowDelete] = useState(false);
+  const imageUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!post.imageId) return;
-    let revoked = false;
+    let cancelled = false;
     getImage(post.imageId).then((img) => {
-      if (img && !revoked) {
+      if (img && !cancelled) {
         const url = URL.createObjectURL(img.blob);
+        imageUrlRef.current = url;
         setImageUrl(url);
       }
     });
     return () => {
-      revoked = true;
-      if (imageUrl) URL.revokeObjectURL(imageUrl);
+      cancelled = true;
+      if (imageUrlRef.current) {
+        URL.revokeObjectURL(imageUrlRef.current);
+        imageUrlRef.current = null;
+      }
     };
   }, [post.imageId]);
 
@@ -56,7 +61,9 @@ export function PostCard({ post, onDelete }: PostCardProps) {
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onDelete(post.id);
+              if (window.confirm('Delete this post?')) {
+                onDelete(post.id);
+              }
             }}
             className="text-sm text-red-400 hover:text-red-300 transition-colors px-3 py-2 -mr-3 min-w-[44px] min-h-[44px] flex items-center justify-center"
           >
