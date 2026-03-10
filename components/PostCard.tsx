@@ -44,12 +44,12 @@ export function PostCard({ post, onDelete }: PostCardProps) {
 
   return (
     <div
-      className="bg-card-bg border border-border-subtle rounded-xl p-4 transition-colors duration-200"
+      className="bg-card-bg/95 rounded-2xl p-5 shadow-lg shadow-black/20 transition-all duration-200"
       onClick={() => setShowDelete((s) => !s)}
     >
       {/* Timestamp + delete */}
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs text-secondary-text">
+        <span className="text-sm text-secondary-text">
           {timeAgo(post.createdAt)}
         </span>
         {showDelete && (
@@ -58,7 +58,7 @@ export function PostCard({ post, onDelete }: PostCardProps) {
               e.stopPropagation();
               onDelete(post.id);
             }}
-            className="text-xs text-red-400 hover:text-red-300 transition-colors px-2 py-1 -mr-2"
+            className="text-sm text-red-400 hover:text-red-300 transition-colors px-3 py-2 -mr-3 min-w-[44px] min-h-[44px] flex items-center justify-center"
           >
             Delete
           </button>
@@ -82,37 +82,37 @@ export function PostCard({ post, onDelete }: PostCardProps) {
           target="_blank"
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
-          className="block border border-border-subtle rounded-lg overflow-hidden mb-3 hover:border-electric-blue/30 transition-colors"
+          className="block rounded-xl overflow-hidden mb-3 bg-near-black/40 hover:bg-near-black/50 transition-colors"
         >
           {post.link.image && (
             <img
               src={post.link.image}
               alt=""
-              className="w-full h-40 object-cover"
+              className="w-full h-52 object-cover"
               loading="lazy"
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = 'none';
               }}
             />
           )}
-          <div className="p-3">
+          <div className="p-4">
             {post.link.siteName && (
               <p className="text-xs text-electric-blue/70 mb-1 uppercase tracking-wide">
                 {post.link.siteName}
               </p>
             )}
             {post.link.title && (
-              <p className="text-sm font-medium text-primary-text leading-snug mb-1">
+              <p className="text-base font-semibold text-primary-text leading-snug mb-1">
                 {post.link.title}
               </p>
             )}
             {post.link.description && (
-              <p className="text-xs text-secondary-text line-clamp-2">
+              <p className="text-sm text-secondary-text line-clamp-2">
                 {post.link.description}
               </p>
             )}
             {!post.link.title && (
-              <p className="text-sm text-electric-blue truncate">
+              <p className="text-base text-electric-blue truncate">
                 {post.link.url}
               </p>
             )}
@@ -122,7 +122,7 @@ export function PostCard({ post, onDelete }: PostCardProps) {
 
       {/* Text */}
       {post.text && (
-        <p className="text-primary-text text-sm leading-relaxed whitespace-pre-wrap break-words">
+        <p className="text-primary-text text-[17px] leading-relaxed whitespace-pre-wrap break-words">
           {post.text}
         </p>
       )}

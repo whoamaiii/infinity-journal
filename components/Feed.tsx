@@ -34,7 +34,7 @@ export function Feed({ posts, loading, hasMore, onLoadMore, onDelete }: FeedProp
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="w-6 h-6 border-2 border-electric-blue/30 border-t-electric-blue rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-electric-blue/30 border-t-electric-blue rounded-full animate-spin" />
       </div>
     );
   }
@@ -44,13 +44,13 @@ export function Feed({ posts, loading, hasMore, onLoadMore, onDelete }: FeedProp
   }
 
   return (
-    <div className="flex flex-col gap-3 pb-28 pt-3">
+    <div className="flex flex-col gap-4 pb-32 pt-4">
       {posts.map((post) => (
         <PostCard key={post.id} post={post} onDelete={onDelete} />
       ))}
       <div ref={sentinelRef} className="h-1" />
       {!hasMore && posts.length > PAGE_SIZE_HINT && (
-        <p className="text-center text-xs text-secondary-text py-4">
+        <p className="text-center text-sm text-secondary-text py-6">
           You've reached the beginning
         </p>
       )}

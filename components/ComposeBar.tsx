@@ -21,7 +21,7 @@ export function ComposeBar({ onSubmit }: ComposeBarProps) {
     const el = textareaRef.current;
     if (!el) return;
     el.style.height = 'auto';
-    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+    el.style.height = Math.min(el.scrollHeight, 150) + 'px';
   }, [text]);
 
   // Auto-detect URLs and fetch preview
@@ -119,7 +119,7 @@ export function ComposeBar({ onSubmit }: ComposeBarProps) {
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 bg-near-black/90 backdrop-blur-xl border-t border-border-subtle"
+      className="fixed bottom-0 left-0 right-0 bg-near-black/80 backdrop-blur-2xl border-t border-white/[0.06]"
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
       {/* Image preview */}
@@ -128,11 +128,11 @@ export function ComposeBar({ onSubmit }: ComposeBarProps) {
           <img
             src={imagePreviewUrl}
             alt="Preview"
-            className="h-16 w-16 rounded-lg object-cover"
+            className="h-20 w-20 rounded-xl object-cover"
           />
           <button
             onClick={clearImage}
-            className="absolute top-2 left-[4.5rem] w-5 h-5 bg-near-black/80 rounded-full flex items-center justify-center text-xs text-secondary-text"
+            className="absolute top-1 left-[5.5rem] w-7 h-7 bg-near-black/80 rounded-full flex items-center justify-center text-sm text-secondary-text"
           >
             ✕
           </button>
@@ -154,7 +154,7 @@ export function ComposeBar({ onSubmit }: ComposeBarProps) {
               />
             )}
             <div className="min-w-0 flex-1">
-              <p className="text-xs text-primary-text truncate">
+              <p className="text-sm text-primary-text truncate">
                 {linkPreview.title}
               </p>
               <p className="text-xs text-secondary-text truncate">
@@ -166,7 +166,7 @@ export function ComposeBar({ onSubmit }: ComposeBarProps) {
                 setLinkPreview(null);
                 lastFetchedUrl.current = null;
               }}
-              className="text-secondary-text text-xs px-1"
+              className="text-secondary-text text-sm px-2 py-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
             >
               ✕
             </button>
@@ -176,21 +176,21 @@ export function ComposeBar({ onSubmit }: ComposeBarProps) {
 
       {fetchingLink && (
         <div className="px-4 pt-2">
-          <p className="text-xs text-secondary-text">Fetching link preview...</p>
+          <p className="text-sm text-secondary-text">Fetching link preview...</p>
         </div>
       )}
 
       {/* Input row */}
-      <div className="flex items-end gap-2 px-3 py-3">
+      <div className="flex items-end gap-3 px-4 py-4">
         {/* Image upload button */}
         <button
           onClick={() => fileInputRef.current?.click()}
-          className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-full bg-card-bg border border-border-subtle text-secondary-text hover:text-electric-blue transition-colors mb-0.5"
+          className="flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-full bg-card-bg/80 border border-white/[0.06] text-secondary-text hover:text-electric-blue transition-colors"
           aria-label="Add image"
         >
           <svg
-            width="18"
-            height="18"
+            width="20"
+            height="20"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -220,14 +220,14 @@ export function ComposeBar({ onSubmit }: ComposeBarProps) {
           onKeyDown={handleKeyDown}
           placeholder="What's on your mind?"
           rows={1}
-          className="flex-1 bg-card-bg border border-border-subtle rounded-2xl px-4 py-2.5 text-sm text-primary-text placeholder-secondary-text/50 focus:outline-none focus:border-electric-blue/40 transition-colors"
+          className="flex-1 bg-card-bg/80 border border-white/[0.06] rounded-2xl px-4 py-3 text-[17px] text-primary-text placeholder-secondary-text/50 focus:outline-none focus:border-electric-blue/40 transition-colors"
         />
 
         {/* Submit button */}
         <button
           onClick={handleSubmit}
           disabled={!hasContent}
-          className={`flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-full transition-all duration-200 mb-0.5 ${
+          className={`flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-full transition-all duration-200 ${
             hasContent
               ? 'bg-electric-blue text-near-black'
               : 'bg-card-bg border border-border-subtle text-secondary-text/40'
@@ -235,8 +235,8 @@ export function ComposeBar({ onSubmit }: ComposeBarProps) {
           aria-label="Post"
         >
           <svg
-            width="16"
-            height="16"
+            width="18"
+            height="18"
             viewBox="0 0 24 24"
             fill="currentColor"
           >

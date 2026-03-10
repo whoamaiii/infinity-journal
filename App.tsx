@@ -15,16 +15,19 @@ export default function App() {
   return (
     <div className="min-h-screen bg-near-black">
       {/* Header */}
-      <header className="sticky top-0 z-20 bg-near-black/90 backdrop-blur-xl border-b border-border-subtle">
-        <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
-          <h1 className="text-lg font-semibold text-primary-text tracking-tight">
+      <header
+        className="sticky top-0 z-20 bg-near-black/80 backdrop-blur-2xl border-b border-white/[0.06]"
+        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+      >
+        <div className="px-5 py-4 flex items-center justify-between">
+          <h1 className="text-xl font-semibold text-primary-text tracking-tight">
             ♾️ Infinity Journal
           </h1>
         </div>
       </header>
 
       {/* Feed */}
-      <main className="max-w-lg mx-auto px-3">
+      <main className="px-4">
         <Feed
           posts={posts}
           loading={loading}
