@@ -1,24 +1,26 @@
+export type PostType = 'text' | 'image' | 'link';
 
-export enum EntryType {
-  TEXT = 'text',
-  IMAGE = 'image',
-  VIDEO = 'video', // Conceptually a video, represented by a thumbnail image
-  VOICE_MEMO = 'voice_memo', // Text input, styled as if dictated
+export interface LinkPreview {
+  url: string;
+  title?: string;
+  description?: string;
+  image?: string;
+  siteName?: string;
+  fetchedAt: number;
 }
 
-export interface JournalEntry {
+export interface Post {
   id: string;
-  type: EntryType;
-  timestamp: string; // ISO string
-  content: string; // User's text, or base64 data URI for media thumbnail
-  mediaMimeType?: string; // e.g., 'image/png'
-  geminiInsight?: string; // Analysis from Gemini
-  originalFileName?: string; // For file uploads
-  mood?: string; // Emoji representing the mood
+  type: PostType;
+  createdAt: number;
+  text?: string;
+  imageId?: string;
+  link?: LinkPreview;
 }
 
-export interface MediaFile {
-  name: string;
-  type: string; // Mime type
-  base64: string;
+export interface StoredImage {
+  id: string;
+  blob: Blob;
+  mimeType: string;
+  createdAt: number;
 }
